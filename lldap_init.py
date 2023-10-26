@@ -94,7 +94,7 @@ def create_user(user_original):
         "-W", "uid=" + user["id"] + ",ou=people," + base_dn,
         "-T", password_file
     ], capture_output=True)
-    ret.check_returncode()
+    assert ret.returncode == 0, "error setting password for " + user["id"]
     print("\tCreated user '{}'".format(user["id"]))
 ### FUNCTIONS END ###
 
