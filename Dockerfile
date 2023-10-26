@@ -1,10 +1,9 @@
-FROM python:3
+FROM python:3-alpine
 
 WORKDIR /usr/src/app
 RUN pip install --no-cache-dir qlient==1.0.0
 
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y ldap-utils && rm -rf /var/lib/apt/lists/*
+RUN RUN apk add --no-cache openldap-clients
 
 COPY lldap_init.py .
 
