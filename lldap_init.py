@@ -91,8 +91,8 @@ def create_user(user_original):
         "-H", ldap_url,
         "-D", "uid=" + admin_username + ",ou=people," + base_dn,
         "-y", admin_password_file,
-        "-T", password_file
-        "uid=" + user["id"] + ",ou=people," + base_dn,
+        "-T", password_file,
+        "uid=" + user["id"] + ",ou=people," + base_dn
     ], capture_output=True)
     assert ret.returncode == 0, "error setting password for " + user["id"]
     print("\tCreated user '{}'".format(user["id"]))
