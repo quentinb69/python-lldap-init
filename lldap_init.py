@@ -3,18 +3,20 @@ import subprocess
 import json
 import os
 
-from requests import Session
+from requests import RequestException, Session
 from qlient.http import HTTPBackend, HTTPClient, Fields
 
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', "/config/admin_password")
 CONFIG_FILE = os.environ.get('CONFIG_FILE', "/config/config_file.json")
 
 # load configuration
-assert os.path.isfile(CONFIG_FILE) is True, "Configuration " + CONFIG_FILE + " does not exist..."
+assert os.path.isfile(CONFIG_FILE) is True, "Configuration " + \
+    CONFIG_FILE + " does not exist..."
 with open(CONFIG_FILE) as config_file:
     CONFIG = json.load(config_file)
 
-assert os.path.isfile(ADMIN_PASSWORD) is True, "Admin password file " + ADMIN_PASSWORD + " does not exist..."
+assert os.path.isfile(ADMIN_PASSWORD) is True, "Admin password file " + \
+    ADMIN_PASSWORD + " does not exist..."
 admin_password_file = ADMIN_PASSWORD
 
 assert len(CONFIG["admin_username"]) > 0, "admin_username not set..."
@@ -37,10 +39,18 @@ users = CONFIG["seed"].get("users", [])
 session = Session()
 with open(admin_password_file, "r") as f:
     admin_password = f.read()
-jwt_token = session.post(url=f'{web_url}/auth/simple/login', json={
-    "username": admin_username,
-    "password": admin_password,
-}).json()["token"]
+
+try:
+    jwt_token = session.post(
+        url=f'{web_url}/auth/simple/login',
+        json={
+            "username": admin_username,
+            "password": admin_password,
+        }
+    ).json()["token"]
+except RequestException as e:  # This is the correct syntax
+    raise SystemExit(e)
+
 admin_password = ""
 session.headers["Authorization"] = f"Bearer {jwt_token}"
 client = HTTPClient(HTTPBackend(f'{web_url}/api/graphql', session=session))
@@ -51,8 +61,7 @@ USER_FIELDS = Fields("id", "email", "displayName", groups=GROUP_FIELDS)
 
 # get groups and users infos
 existing_groups = client.query.groups(GROUP_FIELDS).data["groups"]
-existing_groups_map = {group["displayName"]
-    : group for group in existing_groups}
+existing_groups_map = {group["displayName"]: group for group in existing_groups}
 existing_users = client.query.users(USER_FIELDS).data["users"]
 existing_users_map = {user["id"]: user for user in existing_users}
 
