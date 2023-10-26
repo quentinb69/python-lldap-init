@@ -8,24 +8,6 @@ from qlient.http import HTTPBackend, HTTPClient, Fields
 
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', "/config/admin_password")
 CONFIG_FILE = os.environ.get('CONFIG_FILE', "/config/config_file.json")
-# CONFIG = {
-#     "admin_username": "",
-#     "ldap_url": "",
-#     "web_url": "",
-#     "base_dn": "",
-#     "seed": {
-#         "groups": [""],
-#         "users": [
-#             {
-#                 "id": "",
-#                 "email": "",
-#                 "displayName": "",
-#                 "groups": [""],
-#                 "password_file": "",
-#             },
-#         ],
-#     }
-# }
 
 # load configuration
 with open(CONFIG_FILE) as config_file:
@@ -123,18 +105,3 @@ for must_exist_user in sorted(users, key=lambda x: x["id"]):
 
     else:
         print(f"User '{must_exist_user_id}' exists, skipping")
-
-# ldapsearch -x -LLL -H ldap://127.0.0.1:3890 -b dc=example,dc=com -D "uid=admin,ou=people,dc=example,dc=com" -W
-# ldapadd -x -H ldap://127.0.0.1:3890 -D "uid=admin,ou=people,dc=example,dc=com" -W -f ldap.ldif
-# ldappasswd -x -H ldap://127.0.0.1:3890 -D "uid=admin,ou=people,dc=example,dc=com" -W "uid=test3,ou=people,dc=example,dc=com" -s test1234
-# ldappasswd -x -H ldap://localhost:3890 -D uid=admin,ou=people,dc=example,dc=com -y ./admin_password_file -W uid=server_user_b,ou=people,dc=example,dc=com -T ./pass_a
-
-# dn: uid=test3,ou=people,dc=example,dc=com
-# objectclass: inetOrgPerson
-# objectclass: posixAccount
-# objectclass: mailAccount
-# objectclass: person
-# uid: test3
-# mail: test3@test
-# cn: test3
-# userPassword: new-password

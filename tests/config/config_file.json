@@ -1,0 +1,25 @@
+{
+    "admin_username": "admin",
+    "ldap_url": "ldap://lldap:3890",
+    "web_url": "http://lldap:17170",
+    "base_dn": "dc=example,dc=com",
+    "seed": {
+        "groups": ["grp", "grp2"],
+        "users": [
+            {
+                "id": "user1",
+                "email": "u1@gmail.com",
+                "displayName": "User 1",
+                "groups": ["grp", "grp2"],
+                "password_file": "/config/pass_user1"
+            },
+            {
+                "id": "user2",
+                "email": "u2@gmail.com",
+                "displayName": "User 2",
+                "groups": ["grp"],
+                "password_file": "/config/pass_user2"
+            }
+        ]
+    }
+}
