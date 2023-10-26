@@ -19,7 +19,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            quentinb69/go-myip
+            quentinb69/lldap-init
           tags: |
             type=ref,event=branch,value={{branch}}
             type=semver,pattern={{major}}.{{minor}}.{{patch}}
