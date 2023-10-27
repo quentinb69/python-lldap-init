@@ -11,14 +11,14 @@
                 "email": "u1@gmail.com",
                 "displayName": "User 1",
                 "groups": ["grp", "grp2"],
-                "password_file": "/config/pass_user1"
+                "password_file": "/config/pass_user_1"
             },
             {
                 "id": "user2",
                 "email": "u2@gmail.com",
                 "displayName": "User 2",
                 "groups": ["grp"],
-                "password_file": "/config/pass_user2"
+                "password_file": "/config/pass_user_2"
             }
         ]
     }

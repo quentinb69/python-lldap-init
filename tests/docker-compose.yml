@@ -13,7 +13,13 @@ services:
 
   bootstrap:
     image: lldap_init
-    build: ../
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        http_proxy:
+        https_proxy:
+        no_proxy:
     depends_on: 
       - lldap
     volumes:
