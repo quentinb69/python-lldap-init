@@ -100,7 +100,6 @@ def create_single_user(user: json, ldap_url: str, base_dn: str, admin_username: 
     ], capture_output=True)
     validate(ret.returncode == 0, "Error setting password for '" +
              user["id"] + "'.\n" + ret.stderr.decode("utf-8"))
-    print("\tUser '{}' created.".format(user["id"]))
 
     return user
 
@@ -141,13 +140,14 @@ def create_all_users(users: json, existing_groups_map: dict, ldap_url: str, base
 
         if must_exist_user_id not in existing_users_map:
             print(f"User '{must_exist_user_id}' does not exist, creating...")
-            create_single_user(must_exist_user, ldap_url, base_dn,
+            user = create_single_user(must_exist_user, ldap_url, base_dn,
                                admin_username, admin_password_file, client)
-
+            existing_users_map[must_exist_user_id] = user
+            print(f"\tUser '{must_exist_user_id}' created.")
         else:
             print(f"User '{must_exist_user_id}' exists, skipping")
 
-    return must_exist_user_id
+    return existing_users_map
 
 
 def main() -> int:
