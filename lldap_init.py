@@ -3,7 +3,7 @@ import subprocess
 import json
 import os
 
-from requests import JSONDecodeError, RequestException, Session
+from requests import RequestException, Session
 from qlient.http import HTTPBackend, HTTPClient, Fields
 
 # set structures for graphQL
@@ -24,7 +24,7 @@ def validate(expression: bool, message: str = "") -> None:
     return
 
 
-def validateConfiguration(configuration_file: str, admin_password_file: str) -> json:
+def validateConfiguration(configuration_file: str, admin_password_file: str) -> dict:
     """ Validate and return configuration dict """
 
     validate(os.path.isfile(admin_password_file) is True, "admin_password_file '" +
@@ -33,7 +33,7 @@ def validateConfiguration(configuration_file: str, admin_password_file: str) -> 
              configuration_file + "' does not exist...")
 
     with open(configuration_file) as config_file:
-        configuration: json = json.load(config_file)
+        configuration: dict = json.load(config_file)
     validate(len(configuration["admin_username"])
              > 0, "admin_username not set...")
     validate(len(configuration["ldap_url"]) > 0, "ldap_url not set...")
@@ -63,7 +63,7 @@ def createauthenticatedWebClient(admin_username: str, web_url: str, admin_passwo
         raise SystemExit(e)
 
     validate(jwt_token_request.status_code == 200, jwt_token_request.content)
-    jwt_token = jwt_token_request.json()["token"]
+    jwt_token: str = jwt_token_request.json()["token"]
 
     session.headers["Authorization"] = f"Bearer {jwt_token}"
     httpclient = HTTPClient(HTTPBackend(
@@ -72,7 +72,7 @@ def createauthenticatedWebClient(admin_username: str, web_url: str, admin_passwo
     return httpclient
 
 
-def create_single_user(user: json, ldap_url: str, base_dn: str, admin_username: str, admin_password_file: str, client: HTTPClient) -> json:
+def create_single_user(user: dict, ldap_url: str, base_dn: str, admin_username: str, admin_password_file: str, client: HTTPClient) -> json:
     """ Create a user via graphql and set its password via ldappasswd """
 
     groups = user.pop("groups", [])
@@ -104,17 +104,17 @@ def create_single_user(user: json, ldap_url: str, base_dn: str, admin_username: 
     return user
 
 
-def create_all_groups(groups: json, client: HTTPClient) -> dict:
+def create_all_groups(groups: dict, client: HTTPClient) -> dict:
     """ Create all groups with graphql """
 
-    existing_groups: json = client.query.groups(GROUP_FIELDS).data["groups"]
+    existing_groups: dict = client.query.groups(GROUP_FIELDS).data["groups"]
     existing_groups_map: dict = {
         group["displayName"]: group for group in existing_groups}
 
     for must_exist_group in sorted(groups):
         if must_exist_group not in existing_groups_map:
             print(f"Group '{must_exist_group}' does not exist, creating...")
-            group: json = client.mutation.createGroup(
+            group: dict = client.mutation.createGroup(
                 name=must_exist_group, _fields=GROUP_FIELDS).data["createGroup"]
             existing_groups_map[must_exist_group] = group
             print(f"\tGroup '{must_exist_group}' created.")
@@ -124,10 +124,10 @@ def create_all_groups(groups: json, client: HTTPClient) -> dict:
     return existing_groups_map
 
 
-def create_all_users(users: json, existing_groups_map: dict, ldap_url: str, base_dn: str, admin_username: str, admin_password_file: str, client: HTTPClient) -> dict:
+def create_all_users(users: dict, existing_groups_map: dict, ldap_url: str, base_dn: str, admin_username: str, admin_password_file: str, client: HTTPClient) -> dict:
     """ Create all users with graphql and ldappasswd"""
 
-    existing_users: json = client.query.users(USER_FIELDS).data["users"]
+    existing_users: dict = client.query.users(USER_FIELDS).data["users"]
     existing_users_map: dict = {user["id"]: user for user in existing_users}
 
     for must_exist_user in sorted(users, key=lambda x: x["id"]):
