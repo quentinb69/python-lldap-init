@@ -1,10 +1,10 @@
 # Inspired from https://github.com/lldap/lldap/issues/654#issuecomment-1694251863
-import subprocess
 import json
 import os
+import subprocess
 
-from requests import RequestException, Session
 from qlient.http import HTTPBackend, HTTPClient, Fields
+from requests import RequestException, Session
 
 # set structures for graphQL
 GROUP_FIELDS = Fields("id", "displayName")
@@ -141,7 +141,7 @@ def create_all_users(users: dict, existing_groups_map: dict, ldap_url: str, base
         if must_exist_user_id not in existing_users_map:
             print(f"User '{must_exist_user_id}' does not exist, creating...")
             user = create_single_user(must_exist_user, ldap_url, base_dn,
-                               admin_username, admin_password_file, client)
+                                      admin_username, admin_password_file, client)
             existing_users_map[must_exist_user_id] = user
             print(f"\tUser '{must_exist_user_id}' created.")
         else:
@@ -161,7 +161,8 @@ def main() -> int:
     groups = create_all_groups(configuration_groups, client)
     users = create_all_users(configuration_users, groups,
                              configuration["ldap_url"], configuration["base_dn"], configuration["admin_username"], ADMIN_PASSWORD, client)
-    print("Finished: " + str(len(users)) + " users and " + str(len(groups)) + " groups.")
+    print("Finished: " + str(len(users)) +
+          " users and " + str(len(groups)) + " groups.")
     return 0
 
 
